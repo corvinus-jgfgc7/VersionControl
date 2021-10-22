@@ -24,6 +24,7 @@ namespace VaR
             dataGridView1.DataSource = Ticks;
 
             CreatePortfolio();
+
         }
 
         private void CreatePortfolio() 
@@ -38,6 +39,22 @@ namespace VaR
             p.Index = "OTP";
             p.Volume = 10;
             Portfolio.Add(p); leegyszerűsíthető 1 sorba*/
+        }
+
+        private decimal GetPortfolioValue(DateTime date)
+        {
+            decimal value = 0;
+            foreach (var item in Portfolio)
+            {
+                var last = (from x in Ticks
+                            where item.Index == x.Index.Trim()
+                               && date <= x.TradingDay
+                            orderby x.TradingDay
+                            select x)
+                            .First();
+                value += (decimal)last.Price * item.Volume;
+            }
+            return value;
         }
     }
 }
