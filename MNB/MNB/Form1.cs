@@ -19,14 +19,30 @@ namespace MNB
     {
 
         BindingList<RateData> Rates = new BindingList<RateData>();
+        BindingList<string> currencies = new BindingList<string>();
         public Form1()
         {
             InitializeComponent();
+            cbxValuta.DataSource = currencies;
+            MNBArfolyamServiceSoapClient mnbService = new MNBArfolyamServiceSoapClient(); //form szintjén példányosítás
+            GetCurrenciesRequestBody request = new GetCurrenciesRequestBody();
+            var response = mnbService.GetCurrencies(request);
+            string result = response.GetCurrenciesResult;
+            XmlDocument vxml = new XmlDocument();
+            vxml.LoadXml(result);
+            foreach (XmlElement item in vxml.DocumentElement.FirstChild.ChildNodes)
+            {
+                currencies.Add(item.InnerText);
+            }
+
+
             RefreshData();
         }
 
         private void RefreshData()
         {
+            if (cbxValuta.SelectedItem == null) return;
+
             Rates.Clear();
             string xmlstring = Consume();
             LoadXML(xmlstring);
@@ -36,7 +52,7 @@ namespace MNB
 
         string Consume() 
         {
-            MNBArfolyamServiceSoapClient mnbService = new MNBArfolyamServiceSoapClient();
+            MNBArfolyamServiceSoapClient mnbService = new MNBArfolyamServiceSoapClient(); //form szintjén példányosítás
             GetExchangeRatesRequestBody request = new GetExchangeRatesRequestBody();
             request.currencyNames = cbxValuta.SelectedItem.ToString(); //"EUR";
             request.startDate = TolPicker.Value.ToString("yyyy-MM-dd"); //"2020-01-01";
@@ -56,6 +72,8 @@ namespace MNB
                 RateData r = new RateData();
                 r.Date = DateTime.Parse(item.GetAttribute("date"));
                 XmlElement child = (XmlElement)item.FirstChild; //ChildNodes[0]
+                if (child == null)
+                    continue;
                 r.Currency = child.GetAttribute("curr");
                 r.Value = decimal.Parse(child.InnerText);
                 int unit = int.Parse(child.GetAttribute("unit"));
