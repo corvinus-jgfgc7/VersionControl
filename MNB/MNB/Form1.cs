@@ -22,6 +22,12 @@ namespace MNB
         public Form1()
         {
             InitializeComponent();
+            RefreshData();
+        }
+
+        private void RefreshData()
+        {
+            Rates.Clear();
             string xmlstring = Consume();
             LoadXML(xmlstring);
             dataGridView1.DataSource = Rates;
@@ -32,9 +38,9 @@ namespace MNB
         {
             MNBArfolyamServiceSoapClient mnbService = new MNBArfolyamServiceSoapClient();
             GetExchangeRatesRequestBody request = new GetExchangeRatesRequestBody();
-            request.currencyNames = "EUR";
-            request.startDate = "2020-01-01";
-            request.endDate = "2020-06-30";
+            request.currencyNames = cbxValuta.SelectedItem.ToString(); //"EUR";
+            request.startDate = TolPicker.Value.ToString("yyyy-MM-dd"); //"2020-01-01";
+            request.endDate = IgPicker.Value.ToString("yyyy-MM-dd"); //"2020-06-30";
             mnbService.GetExchangeRates(request);
             var response = mnbService.GetExchangeRates(request);
             string result = response.GetExchangeRatesResult;
@@ -77,6 +83,11 @@ namespace MNB
             chartArea.AxisX.MajorGrid.Enabled = false;
             chartArea.AxisY.MajorGrid.Enabled = false;
             chartArea.AxisY.IsStartedFromZero = false;
+        }
+
+        private void filterChanged(object sender, EventArgs e)
+        {
+            RefreshData();
         }
     }
 }
