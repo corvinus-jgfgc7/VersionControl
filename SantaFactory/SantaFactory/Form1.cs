@@ -1,4 +1,5 @@
-﻿using SantaFactory.Entities;
+﻿using SantaFactory.Abstractions;
+using SantaFactory.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,37 +14,41 @@ namespace SantaFactory
 {
     public partial class Form1 : Form
     {
-        List<Ball> _balls = new List<Ball>();
+        List<Toy> _toys = new List<Toy>();
 
-        private BallFactory _ballfactory;
+        private Toy _nextToy;
 
-        public BallFactory BallFactory
+        private IToyFactory _factory;
+        public IToyFactory ToyFactory
         {
-            get { return _ballfactory; }
-            set { _ballfactory = value; }
+            get { return _factory; }
+            set
+            {
+                _factory = value;
+                DisplayNext();
+            }
         }
-
 
         public Form1()
         {
             InitializeComponent();
-            BallFactory = new BallFactory();
+            ToyFactory = new BallFactory();
 
-            var b = BallFactory.CreateNew();
+            var b = ToyFactory.CreateNew();
         }
 
         private void createTimer_Tick(object sender, EventArgs e)
         {
-            var ball = BallFactory.CreateNew();
-            _balls.Add(ball);
-            mainPanel.Controls.Add(ball);
-            ball.Left = -ball.Width;
+            Toy toy = (Toy)ToyFactory.CreateNew(); //Ball ball = (Ball)BallFactory.CreateNew();
+            _toys.Add(toy);
+            mainPanel.Controls.Add(toy);
+            toy.Left = -toy.Width;
         }
 
         private void conveyorTimer_Tick(object sender, EventArgs e)
         {
             var lastPosition = 0;
-            foreach (var item in _balls)
+            foreach (var item in _toys)
             {
                 item.MoveToy();
                 if (item.Left > lastPosition)
@@ -54,11 +59,31 @@ namespace SantaFactory
 
             if (lastPosition >= 1000)
             {
-                var oldestBall = _balls[0];
-                _balls.Remove(oldestBall);
+                var oldestBall = _toys[0];
+                _toys.Remove(oldestBall);
                 mainPanel.Controls.Remove(oldestBall);
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ToyFactory = new CarFactory();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ToyFactory = new BallFactory();
+        }
+
+        private void DisplayNext() 
+        {
+            if (_nextToy != null)
+                this.Controls.Remove(_nextToy);
+
+            _nextToy = ToyFactory.CreateNew();
+            _nextToy.Top = lblNext.Top;
+            _nextToy.Left = lblNext.Left + lblNext.Width;
+            Controls.Add(_nextToy);
+        }
     }
 }
