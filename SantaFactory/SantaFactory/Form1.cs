@@ -12,6 +12,7 @@ using System.Windows.Forms;
 
 namespace SantaFactory
 {
+
     public partial class Form1 : Form
     {
         List<Toy> _toys = new List<Toy>();
@@ -72,7 +73,11 @@ namespace SantaFactory
 
         private void button2_Click(object sender, EventArgs e)
         {
-            ToyFactory = new BallFactory();
+            ToyFactory = new BallFactory()
+            { 
+                BallColor = btnColor.BackColor           
+            };
+            //ToyFactory.BallColor nem működik, ((BallFactory)ToyFactory)
         }
 
         private void DisplayNext() 
@@ -85,5 +90,26 @@ namespace SantaFactory
             _nextToy.Left = lblNext.Left + lblNext.Width;
             Controls.Add(_nextToy);
         }
+
+        private void btnColor_Click(object sender, EventArgs e)
+        {
+            var button = (Button)sender;
+            var cd = new ColorDialog();
+            cd.Color = button.BackColor;
+
+            if (cd.ShowDialog() != DialogResult.OK)
+                return;
+            button.BackColor = cd.Color;
+        }
+
+        private void btnPresent_Click(object sender, EventArgs e)
+        {
+            ToyFactory = new PresentFactory()
+            {
+                BoxColor = btnColorBox.BackColor,
+                RibbonColor = btnColorRibbon.BackColor
+            };
+        }
+
     }
 }
