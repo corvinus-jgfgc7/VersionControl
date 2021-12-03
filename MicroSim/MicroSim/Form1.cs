@@ -14,6 +14,8 @@ namespace MicroSim
 {
     public partial class Form1 : Form
     {
+        Random rng = new Random(1234);
+
         List<Person> Population = null; //= new List<Person>();
         List<BirthProbability> BirthProbabilities = null;
         List<DeathProbability> DeathProbabilities = null;
@@ -25,6 +27,23 @@ namespace MicroSim
             Population = GetPopulation(@"C:\Temp\nép-teszt.csv");
             BirthProbabilities = GetBirthprobabilities(@"C:\Temp\születés.csv");
             DeathProbabilities = GetDeathprobabilities(@"C:\Temp\halál.csv");
+
+            for (int year = 2005; year <= 2024; year++)
+            {
+                
+                {
+                    //...
+                }
+
+                int nbrOfMales = (from x in Population
+                                  where x.Gender == Gender.Male && x.IsAlive
+                                  select x).Count();
+                int nbrOfFemales = (from x in Population
+                                    where x.Gender == Gender.Female && x.IsAlive
+                                    select x).Count();
+                Console.WriteLine(
+                    string.Format("Év: {0}\nFiúk: {1}\nLányok: {2}\n", year, nbrOfMales, nbrOfFemales));
+            }
         }
 
         public List<Person> GetPopulation(string csvPath)
