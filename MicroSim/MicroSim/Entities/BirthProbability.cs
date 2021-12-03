@@ -8,7 +8,7 @@ namespace MicroSim.Entities
 {
     public class BirthProbability
     {
-        public int Age { get; set; }
+        public byte Age { get; set; }
 
         public int NbrOfChildren { get; set; }
 
