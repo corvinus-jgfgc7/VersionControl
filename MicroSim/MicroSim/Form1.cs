@@ -20,30 +20,16 @@ namespace MicroSim
         List<BirthProbability> BirthProbabilities = null;
         List<DeathProbability> DeathProbabilities = null;
 
+        List<int> CountOfMales;
+        List<int> CountOfFemales;
+
         public Form1()
         {
             InitializeComponent();
 
-            Population = GetPopulation(@"C:\Temp\nép-teszt.csv");
             BirthProbabilities = GetBirthprobabilities(@"C:\Temp\születés.csv");
             DeathProbabilities = GetDeathprobabilities(@"C:\Temp\halál.csv");
 
-            for (int year = 2005; year <= 2024; year++)
-            {
-                for (int i = 0; i < Population.Count; i++)
-                {
-                    SimStep(year, Population[i]);
-                }
-
-                int nbrOfMales = (from x in Population
-                                  where x.Gender == Gender.Male && x.IsAlive
-                                  select x).Count();
-                int nbrOfFemales = (from x in Population
-                                    where x.Gender == Gender.Female && x.IsAlive
-                                    select x).Count();
-                Console.WriteLine(
-                    string.Format("Év: {0}\nFiúk: {1}\nLányok: {2}\n", year, nbrOfMales, nbrOfFemales));
-            }
         }
 
         private void SimStep(int year, Person person)
@@ -151,5 +137,74 @@ namespace MicroSim
             return deathProbabilities;
         }
 
+
+
+
+        private void StartSimulation(int endYear, string csvPath)
+        {
+            txtMain.Text = "";
+            CountOfMales = new List<int>();
+            CountOfFemales = new List<int>();
+
+            Population = GetPopulation(@"C:\Temp\nép-teszt.csv");
+
+            for (int year = Convert.ToInt32(nudYear.Value); year <= 2024; year++)
+            {
+                for (int i = 0; i < Population.Count; i++)
+                {
+                    SimStep(year, Population[i]);
+                }
+
+                int nbrOfMales = (from x in Population
+                                  where x.Gender == Gender.Male && x.IsAlive
+                                  select x).Count();
+                int nbrOfFemales = (from x in Population
+                                    where x.Gender == Gender.Female && x.IsAlive
+                                    select x).Count();
+
+                CountOfMales.Add(nbrOfMales);
+                CountOfFemales.Add(nbrOfFemales);
+
+                Console.WriteLine(
+                    string.Format("Év: {0}\nFiúk: {1}\nLányok: {2}\n", year, nbrOfMales, nbrOfFemales));
+            }
+
+            //List<int> Males = nbrOfMales.ToList();
+
+        }
+
+        private void DisplayResults()
+        {
+            int i = 0;
+            string kiiras = "";
+            for (int year = Convert.ToInt32(nudYear.Value); year <= 2024; year++)
+            {
+                
+                kiiras += string.Format("Év: {0}\n\tFiúk: {1}\n\tLányok: {2}\n\n", year, CountOfMales[i], CountOfFemales[i]);
+                i++;
+            }
+            txtMain.Text = kiiras;
+        }
+
+
+        private void startBtn_Click(object sender, EventArgs e)
+        {
+
+
+            StartSimulation((int)nudYear.Value, txtPath.Text);
+
+            DisplayResults();
+        }
+
+        private void browseBtn_Click(object sender, EventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.FileName = txtPath.Text;
+
+            if (ofd.ShowDialog() != DialogResult.OK)
+                return;
+
+            txtPath.Text = ofd.FileName;
+        }
     }
 }
