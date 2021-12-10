@@ -15,6 +15,7 @@ namespace EvolutionExample
     {
         GameController gc = new GameController();
         GameArea ga = null;
+        Brain winnerBrain = null;
 
         int populationSize = 100;
         int nbrOfSteps = 10;
@@ -47,6 +48,17 @@ namespace EvolutionExample
                              select p;
             var topPerformers = playerList.Take(playerList.Count() / 2).ToList();
 
+            var winners = from p in topPerformers
+                          where p.IsWinner
+                          select p;
+            if (winners.Count() > 0)
+            {
+                winnerBrain = winners.FirstOrDefault().Brain.Clone();
+                gc.GameOver -= Gc_GameOver;
+                btnStart.Visible = true;
+                return;
+            }
+
             gc.ResetCurrentLevel();
             foreach (var p in topPerformers)
             {
@@ -62,6 +74,15 @@ namespace EvolutionExample
                     gc.AddPlayer(brain.Mutate());
             }
             gc.Start();
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            gc.ResetCurrentLevel();
+            gc.AddPlayer(winnerBrain.Clone());
+            gc.AddPlayer();
+            ga.Focus();
+            gc.Start(true);
         }
     }
 }
