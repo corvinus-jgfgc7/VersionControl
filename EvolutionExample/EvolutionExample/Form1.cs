@@ -16,6 +16,11 @@ namespace EvolutionExample
         GameController gc = new GameController();
         GameArea ga = null;
 
+        int populationSize = 100;
+        int nbrOfSteps = 10;
+        int nbrOfStepsIncrement = 10;
+        int generation = 1;
+
         public Form1()
         {
             InitializeComponent();
@@ -23,8 +28,10 @@ namespace EvolutionExample
             ga = gc.ActivateDisplay();
             this.Controls.Add(ga);
 
-            gc.AddPlayer();
-            gc.Start(true);
+            for (int i = 0; i < populationSize; i++)
+                gc.AddPlayer(nbrOfSteps);
+
+            gc.Start();
         }
     }
 }
